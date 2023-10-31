@@ -43,43 +43,46 @@ void HashTable::addEntry(int key) {
 
 void HashTable::removeEntry(int key) {
     int index = hash(key);
+    Node* temp = nullptr;
 
-    if (!table[index]) {
-        return;
+    if (table[index]) {
+        if (table[index]->data == key) {
+            temp = table[index];
+            table[index] = table[index]->next;
+        } else {
+            Node* current = table[index];
+            while (current->next && current->next->data != key) {
+                current = current->next;
+            }
+
+            if (current->next) {
+                temp = current->next;
+                current->next = current->next->next;
+            }
+        }
     }
 
-    if (table[index]->data == key) {
-        Node* temp = table[index];
-        table[index] = table[index]->next;
-        delete temp;
-        return;
-    }
-
-    Node* current = table[index];
-    while (current->next && current->next->data != key) {
-        current = current->next;
-    }
-
-    if (current->next) {
-        Node* temp = current->next;
-        current->next = current->next->next;
+    if (temp) {
         delete temp;
     }
 }
+
 
 Node* HashTable::getEntry(int key) {
     int index = hash(key);
     Node* current = table[index];
+    Node* result = nullptr;
 
-    while (current) {
+    while (current && !result) {
         if (current->data == key) {
-            return current;
+            result = current;
         }
         current = current->next;
     }
 
-    return nullptr;
+    return result;
 }
+
 
 int HashTable::count() {
     int count = 0;
